@@ -102,7 +102,7 @@ function EXPA(username, password, enforceSSL){
 						deferred.resolve(json);
 					}
 				} catch(e) {
-					deferred.reject(e);
+					deferred.resolve(e);
 				}
 				
 			}
