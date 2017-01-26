@@ -122,5 +122,19 @@ function EXPA(username, password, enforceSSL){
 		});
 	};
 
+	_.post = function(url, data){
+		return _.request(url, {
+			method: "POST",
+			form: data
+		});
+	};
+
+	_.patch = function(url, data){
+		return _.request(url, {
+			method: "PATCH",
+			form: data
+		});
+	};
+
 	return _;
 }
