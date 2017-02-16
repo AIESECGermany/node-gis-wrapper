@@ -26,6 +26,10 @@
     "request": "^2.34"
   },
   "dependencies": {
+    "request": "^2.79.0",
     "yapl": "ocjojo/YAPL"
+  },
+  "devDependencies": {
+    "request-debug": "^0.2.0"
   }
 }

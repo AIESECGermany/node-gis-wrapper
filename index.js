@@ -4,33 +4,41 @@ q = require('yapl');
 module.exports = EXPA;
 
 function EXPA(username, password, enforceSSL){
+	var r = request.defaults({
+		rejectUnauthorized: typeof enforceSSL !== 'boolean' ? true : enforceSSL,
+		jar: true,
+		followAllRedirects: true
+	});
 
 	var _ = this,
-	_username = username,
-	_password = password,
-	_enforceSSL = typeof enforceSSL !== 'boolean' ? true : enforceSSL,
 	_baseUrl = 'https://gis-api.aiesec.org/v2',
-	_token,
-	_jar = request.jar();
+	_token;
 
 	var tokenRequest = function(){
 		var deferred = q();
-		request.post({
-			url: 'https://auth.aiesec.org/users/sign_in',
-			form: {
-				"user[email]": _username,
-				"user[password]": _password
-			},
-			"rejectUnauthorized": _enforceSSL,
-			jar: _jar,
-			followAllRedirects: true
-		}, function(error, response, body){
-			if(error) {
-				deferred.reject(error);
-			} else {
-				deferred.resolve(body, response);
-			}
+		
+		r.get('https://auth.aiesec.org/users/sign_in', (error, response, body) => {
+			var match = body.match('<meta.*content="(.*)".*name="csrf-token"');
+
+			r.post({
+				url: 'https://auth.aiesec.org/users/sign_in',
+				form: {
+					"user[email]": username,
+					"user[password]": password,
+					"authenticity_token": match[1],
+					"commit": 'Sign in'
+				}
+			}, function(error, response, body){
+				if(error) {
+					deferred.reject(error);
+				} else {
+					response.body = body;
+					deferred.resolve(response);
+				}
+			});
+
 		});
+
 		return deferred.promise;
 	};
 
@@ -41,10 +49,11 @@ function EXPA(username, password, enforceSSL){
 	 */
 	 var generateNewToken = function() {
 	 	var deferred = q();
-	 	tokenRequest().then(function(){
-	 		var token = _jar.getCookieString('https://experience.aiesec.org').match('expa_token=(.*)')[1].replace(/;.*/, '');
+	 	tokenRequest().then((response) => {
+	 		var cookie = response.req._headers.cookie;
+	 		var token = cookie.match('expa_token=(.*)')[1].replace(/;.*/, '');
 	 		_token = token;
-	 		deferred.resolve(_token);
+	 		deferred.resolve(token);
 	 	});
 	 	return deferred.promise;
 	 };
