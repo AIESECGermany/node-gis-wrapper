@@ -45,7 +45,7 @@ function EXPA(username, password, enforceSSL){
 
 		});
 
-		return deferred.promise;
+		return deferred;
 	};
 
 	 _.getNewToken = function() {
@@ -106,7 +106,7 @@ function EXPA(username, password, enforceSSL){
 			r(params);
 		}, deferred.reject);
 
-		return deferred.promise;
+		return deferred;
 	};
 
 	_.get = function(url, data){
