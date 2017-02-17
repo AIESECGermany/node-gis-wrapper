@@ -4,13 +4,15 @@ q = require('yapl');
 module.exports = EXPA;
 
 function EXPA(username, password, enforceSSL){
+	"use strict";
+
 	var r = request.defaults({
 		rejectUnauthorized: typeof enforceSSL !== 'boolean' ? true : enforceSSL,
 		jar: true,
 		followAllRedirects: true
 	});
 
-	var _ = this,
+	var _ = {},
 	_baseUrl = 'https://gis-api.aiesec.org/v2',
 	_token;
 
@@ -32,8 +34,12 @@ function EXPA(username, password, enforceSSL){
 				if(error) {
 					deferred.reject(error);
 				} else {
-					response.body = body;
-					deferred.resolve(response);
+					if(body.indexOf('<h2>Invalid email or password.') > -1){
+						deferred.reject('Invalid email or password');
+					} else {
+						response.body = body;
+						deferred.resolve(response);
+					}
 				}
 			});
 
@@ -42,42 +48,22 @@ function EXPA(username, password, enforceSSL){
 		return deferred.promise;
 	};
 
-	/**
-	 * generateNewToken()
-	 * function that performs a login with GIS auth to get a new access token
-	 * @return void
-	 */
-	 var generateNewToken = function() {
-	 	var deferred = q();
-	 	tokenRequest().then((response) => {
+	 _.getNewToken = function() {
+		return tokenRequest().then((response) => {
 	 		var cookie = response.req._headers.cookie;
 	 		var token = cookie.match('expa_token=(.*)')[1].replace(/;.*/, '');
 	 		_token = token;
-	 		deferred.resolve(token);
+	 		return token;
 	 	});
-	 	return deferred.promise;
-	 };
-
+	};
 
 	 _.getToken = function(){
-	 	var deferred = q();
 	 	if(_token) {
-	 		deferred.resolve(_token);
+	 		return q().resolve(_token);
 	 	} else {
-	 		_.getNewToken().then(deferred.resolve);
+	 		return _.getNewToken();
 	 	}
-	 	return deferred.promise;
 	 };
-
-	/**
-	 * @return String
-	 */
-	 _.getNewToken = function() {
-	 	var deferred = q();
-		generateNewToken.call(_) //provide EXPA as context
-		.then(deferred.resolve);
-		return deferred.promise;
-	};
 
 	_.request = function(uri, options){
 		var deferred = q();
@@ -90,8 +76,6 @@ function EXPA(username, password, enforceSSL){
 			Object.assign(params, uri);
 		}
 
-		params.jar = _jar;
-		params.rejectUnauthorized = _enforceSSL;
 		if(params.uri.indexOf('http') < 0) params.baseUrl = _baseUrl;
 
 		params.callback = function(err, resp, body){
@@ -119,8 +103,8 @@ function EXPA(username, password, enforceSSL){
 
 		_.getToken().then(function(token){
 			params.uri += `?access_token=${token}`;
-			request(params);
-		});
+			r(params);
+		}, deferred.reject);
 
 		return deferred.promise;
 	};
