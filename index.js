@@ -9,7 +9,8 @@ function EXPA(username, password, enforceSSL){
 	var r = request.defaults({
 		rejectUnauthorized: typeof enforceSSL !== 'boolean' ? true : enforceSSL,
 		jar: true,
-		followAllRedirects: true
+		followAllRedirects: true,
+		qsStringifyOptions: {arrayFormat: 'brackets'}
 	});
 
 	var _ = {},
