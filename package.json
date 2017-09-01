@@ -1,6 +1,6 @@
 {
   "name": "node-gis-wrapper",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A node module for easy interaction with the EXPA API",
   "main": "index.js",
   "scripts": {
