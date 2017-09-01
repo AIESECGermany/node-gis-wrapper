@@ -17,7 +17,7 @@
     "api"
   ],
   "author": "Lukas Ehnle (https://github.com/ocjojo)",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/AIESECGermany/node-gis-wrapper/issues"
   },
