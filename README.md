@@ -9,3 +9,7 @@ Example:
 var expa = require('node-gis-wrapper')('expa_user@email.com', 'password');
 expa.get('current_person.json').then(console.log).catch(console.log);
 ```
+You can install it via npm  
+```bash
+npm install node-gis-wrapper
+```
