@@ -20,7 +20,7 @@ function EXPA(username, password, enforceSSL){
 	var tokenRequest = function(){
 		var deferred = q();
 		
-		r.get('https://auth.aiesec.org/users/sign_in', (error, response, body) => {
+		r.get('https://experience.aiesec.org/auth', (error, response, body) => {
 			var match = body.match('<meta.*content="(.*)".*name="csrf-token"');
 
 			r.post({
